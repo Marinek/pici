@@ -1,4 +1,4 @@
-package pici.scanner;
+package pici.batch;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,11 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +21,6 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
 import lombok.extern.slf4j.Slf4j;
-import pici.database.DirectoryRepo;
 import pici.database.FileRepo;
 import pici.database.dpos.DirectoryDPO;
 import pici.database.dpos.ExifTagDPO;
@@ -32,57 +28,37 @@ import pici.database.dpos.FileDPO;
 
 @Component
 @Slf4j
-public class PathScanner {
-
-	@Autowired
-	private DirectoryRepo dirRepo;
+public class DirectoryProcessor implements ItemProcessor<DirectoryDPO, DirectoryDPO> {
 
 	@Autowired
 	private FileRepo fileRepo;
-
-	@PostConstruct
-	public void init() {
-		log.trace("PathScanner.init()");
-	}
-
-	public Map<Path, DirectoryDPO> scan(Path path) throws IOException {
-		final Map<Path, DirectoryDPO> explodePath = new HashMap<Path, DirectoryDPO>();
-
-		this.scan(path, explodePath);
-
-		return explodePath;
-	}
-
-
-	private Map<Path, DirectoryDPO> scan(Path path, final Map<Path, DirectoryDPO> explodePath) throws IOException {
-
-		Files.walkFileTree(path, new FileVisitor<Path>() {
+	
+	@Override
+	public DirectoryDPO process(final DirectoryDPO directoryDPO) throws Exception {
+		
+		log.error("Repo Size: " + fileRepo.count());
+		
+		Files.walkFileTree(directoryDPO.getPath(), new FileVisitor<Path>() {
 
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
 				log.info("preVisitDirectory: " + dir.toString());
-
-				DirectoryDPO directoryDPO = dirRepo.findOneByPath(dir).orElse(new DirectoryDPO());
-
-				directoryDPO.setPath(dir);
-				directoryDPO.setCount(0);
-
-				directoryDPO = dirRepo.save(directoryDPO);
-
-				explodePath.put(dir,  directoryDPO);
-
-				return FileVisitResult.CONTINUE;
+				
+				if( Files.isSameFile(dir, directoryDPO.getPath()) ) {
+					return FileVisitResult.CONTINUE;
+				}
+				
+				return FileVisitResult.SKIP_SUBTREE;
 			}
 
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 				log.info("Visiting file: " + file);
 
-				DirectoryDPO directoryDPO = explodePath.get(file.getParent());
-				
 				boolean isExisting = isFileExisting(file, directoryDPO);
 				
 				if(isExisting) {
+					log.info("Skipping (already known) file: " + file);
 					return FileVisitResult.CONTINUE;
 				}
 
@@ -91,6 +67,7 @@ public class PathScanner {
 				boolean isImage = getExifData(file, newFile);
 
 				if(!isImage) {
+					log.info("Skipping (no image) file: " + file);
 					return FileVisitResult.CONTINUE;
 				}
 
@@ -162,28 +139,24 @@ public class PathScanner {
 
 			@Override
 			public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-				System.err.println(file);
+				log.error("Error while visiting File: " + file, exc);
 				return FileVisitResult.CONTINUE;
 			}
 
 			@Override
 			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-				System.out.println("PathScanner.scan(...).new FileVisitor() {...}.postVisitDirectory()" + dir.toString());
+				log.info("PostVisitDirectory()" + dir.toString());
 
-				boolean finishedSearch = Files.isSameFile(dir, path);
+				boolean finishedSearch = Files.isSameFile(dir, directoryDPO.getPath());
 				if (finishedSearch) {
-					System.out.println("-------------------------------");
 					return FileVisitResult.TERMINATE;
 				}
-
+				directoryDPO.setScheduledScan(false);
 				return FileVisitResult.CONTINUE;
 			}
-
-
 		});
-
-		return explodePath;
-
+		
+		return directoryDPO;
 	}
 
 }

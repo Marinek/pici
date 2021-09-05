@@ -24,20 +24,30 @@ import lombok.ToString;
 @ToString
 public class DirectoryDPO {
 
-	  @Id
-	  @GeneratedValue(strategy=GenerationType.AUTO)
-	  private Long id;
-	  
-	  @Column(unique = true)
-	  private Path path;
-	  
-	  @OneToMany(mappedBy = "directory")
-	  @JsonIgnore
-	  private Set<FileDPO> files;
-	  
-	  private Integer count;
-	  
-	  public String getPathName() {
-		  return path.toString();
-	  }
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+
+	@Column(unique = true)
+	private Path path;
+
+	@Column(columnDefinition = "boolean default false")
+	private boolean scheduledScan = false;  
+
+	@Column(columnDefinition = "boolean default false")
+	private boolean ignore = false;  
+
+	@OneToMany(mappedBy = "directory")
+	@JsonIgnore
+	private Set<FileDPO> files;
+
+	private int count = 0;
+
+	public String getPathName() {
+		return path.toString();
+	}
+
+	public void incrementCount() {
+		this.count++;		
+	}
 }

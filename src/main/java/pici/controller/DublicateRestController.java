@@ -1,7 +1,6 @@
 package pici.controller;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
+import pici.batch.ScanDirectoryJobLauncher;
 import pici.database.FileRepo;
 import pici.database.dpos.FileDPO;
-import pici.scanner.PathScanner;
 
 @RestController
 @Slf4j
@@ -22,13 +21,17 @@ public class DublicateRestController {
 
 	@Autowired
 	private FileRepo fileRepo;
-	
+
 	@Autowired
-	private PathScanner pathScanner;
+	private ScanDirectoryJobLauncher jobLauncher;
 	
 	@GetMapping(value = {"/scanDir"})
 	public void scanDirectory (@RequestParam("dirName") String dirName) throws IOException {
-		pathScanner.scan(Path.of(dirName));
+		try {
+			jobLauncher.scanDirectory(dirName);
+		} catch (Exception e) {
+			log.error("Error during start of directory scan", e);
+		}
 	}
 	
 	@GetMapping(value = {"/duplicates"})
