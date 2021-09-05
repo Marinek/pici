@@ -17,7 +17,7 @@ import pici.database.dpos.FileDPO;
 
 @RestController
 @Slf4j
-public class DublicateRestController {
+public class DuplicateRestController {
 
 	@Autowired
 	private FileRepo fileRepo;

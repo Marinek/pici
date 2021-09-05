@@ -1,0 +1,27 @@
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div th:fragment="content">
+		<div class="bgc-white p-20 bd">
+			<h6 class="c-grey-900">Nach Bildern suchen</h6>
+			<div class="mT-30">
+				<form  action="#" th:action="@{/}" th:object="${directory}" method="POST">
+					<div class="mb-3 row">
+						
+						<div class="col-sm-12">
+							<input th:field="*{path}" type="text" class="form-control" id="intputPath"	placeholder="Verzeichnis">
+						</div>
+					</div>
+					
+					<div class="mb-3 row">
+						<div class="col-sm-10">
+							<button type="submit" class="btn btn-primary btn-color">Scan starten ...</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

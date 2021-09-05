@@ -1,33 +1,33 @@
 package pici;
 
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import lombok.extern.slf4j.Slf4j;
+import pici.webcontroller.ThymeleafLayoutInterceptor;
 
 @SpringBootApplication
 @EnableBatchProcessing
-public class PiciApplication {
+@Slf4j
+public class PiciApplication implements WebMvcConfigurer {
+	
+	@Autowired
+	private ThymeleafLayoutInterceptor interceptor;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(PiciApplication.class, args);
 	}
 	
-//	@Bean
-//	public CommandLineRunner scannerGO(PathScanner scanner) {
-//		return args -> {
-//
-//			try {
-//				Map<Path, DirectoryDPO> scan = scanner.scan(Paths.get("G:", "OneDrive - Familie Gasse", "Bilder"));
-//				
-//				System.err.println("ENDE");
-//				
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//
-//		};
-//		
-//	}
-	
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		log.info("Add interceptors...");
+		
+		WebMvcConfigurer.super.addInterceptors(registry);
+		
+		registry.addInterceptor(interceptor);
+	}
 }
