@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -16,4 +17,8 @@ public interface FileRepo extends CrudRepository<FileDPO, Long> {
 	
 	@Query("SELECT f from file f where f.fileName=?1 and f.directory.id = ?2")
 	public List<FileDPO> findInDirectory(String fileName, Long directory);
+	
+	@Modifying
+	@Query("update file f set f.isResolved=true where f.contentHash = ?1")
+	public int markAsResolved(String md5);
 }

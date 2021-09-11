@@ -3,10 +3,13 @@ package pici.controller;
 import java.io.IOException;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,6 +51,29 @@ public class DuplicateRestController {
         Page<FileDPO> listDuplicates = fileRepo.listDuplicates(PageRequest.of(currentPage, pageSize));
 		
 		return listDuplicates;
+	}
+	
+	@GetMapping(value = {"/dubletten/original/{id}"})
+	@Transactional
+	public boolean setOriginal(@PathVariable("id") Long id) { 
+		log.info("Setting original: " + id);
+		
+		Optional<FileDPO> originalFile = fileRepo.findById(id);
+		
+		originalFile.ifPresentOrElse(f -> setOriginal(f), () -> log.error("File not Found with ID '{}'", id) );
+		
+		return true;
+	}
+
+	private void setOriginal(FileDPO f) {
+		log.info("This is the original: " + f);
+		
+		f.setOriginal(true);
+		
+		fileRepo.save(f);
+		
+		fileRepo.markAsResolved(f.getContentHash());
+		
 	}
 
 }

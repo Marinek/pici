@@ -11,14 +11,11 @@
 				<div class="col-md-12">
 					<div class="bgc-white bd bdrs-3 p-20 mB-20">
 						<h4 class="c-grey-900 mB-20">Doppelte Fotos</h4>
-						<table id="myTable" class="table table-striped table-bordered"
-							cellspacing="0" width="100%">
+						<table id="myTable" class="table table-striped table-bordered">
 							<thead>
 								<tr>
-									<th>#</th>
 									<th>Dateiname</th>
 									<th>Verzeichnis</th>
-									<th>Vorschau</th>
 									<th>Aktionen</th>
 								</tr>
 							</thead>
@@ -56,29 +53,28 @@
 														},
 														"columns" : [
 																{
-																	"data" : "id"
-																},
-																{
 																	"data" : "fileName",
 																	"render" : function(
 																			data,
 																			type,
 																			row) {
 
+																		var renderOutput = '';
+																		
 																		if (type === 'display') {
-
+																			
+																			renderOutput +=  '<img class="bdrs-50p w-3r h-3r" height="50" width="50" src="image/'  + row.id + '"/>';
+																				
 																			if (row.resolved === true) {
-																				data += '<span class="badge rounded-pill fl-r bg-success lh-0 p-10">Erledigt</span>';
+																				renderOutput += '<span class="badge rounded-pill fl-r bg-success lh-0 p-10">Erledigt</span>';
 																			}
 
 																			if (row.original === true) {
-																				data += '<span class="badge rounded-pill fl-r  bg-info  lh-0 p-10">Original</span>';
+																				renderOutput += '<span class="badge rounded-pill fl-r  bg-info  lh-0 p-10">Original</span>';
 																			}
-
-																			data
 																		}
 
-																		return data;
+																		return renderOutput + '&nbsp' + data;
 																	}
 
 																},
@@ -92,18 +88,23 @@
 																			type) {
 																		if (type === 'display') {
 
-																			return '<img height="50" width="50" src="image/'  +data + '"/>';
+																			return '<button type="button" onclick="setOriginal('+data+')" class="btn cur-p btn-success btn-color">Original</button>';
 																		}
 
 																		return data;
 																	}
-																},
-																{
-																	"data" : "id"
 																} ]
 
 													});
 								});
+				
+						function setOriginal(data)	{
+							 $.ajax({url: "dubletten/original/" + data, success: function(result){
+								 $('#myTable').DataTable().ajax.reload(null, false)
+								  }});
+							 
+							 return false;
+						}
 			</script>
 		</div>
 

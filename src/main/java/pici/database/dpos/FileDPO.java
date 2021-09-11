@@ -16,13 +16,11 @@ import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity(name = "file")
 @Table(name = "files")
 @Getter
 @Setter
-@ToString
 public class FileDPO {
 
 	@Id
@@ -53,4 +51,13 @@ public class FileDPO {
 		exifTagDPO.setFile(this);
 		
 	}
+
+	@Override
+	public String toString() {
+		return "FileDPO [id=" + id + ", directory=" + directory.getPathName() + ", fileName=" + fileName
+				+ ", contentHash=" + contentHash + ", mimeType=" + mimeType + ", isOriginal=" + isOriginal
+				+ ", isResolved=" + isResolved + "]";
+	}
+	
+	
 }
