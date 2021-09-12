@@ -42,6 +42,13 @@ public class DirectoryDPO {
 	private Set<FileDPO> files;
 
 	private int count = 0;
+	
+	public DirectoryDPO(Path path) {
+		this.path = path;
+	}
+
+	public DirectoryDPO() {
+	}
 
 	public String getPathName() {
 		return path.toString();

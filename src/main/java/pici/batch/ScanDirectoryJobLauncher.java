@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScanDirectoryJobLauncher {
 
-
 	@Autowired
 	@Qualifier("asyncJobLauncher")
 	private JobLauncher jobLauncher;

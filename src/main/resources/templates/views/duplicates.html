@@ -22,6 +22,14 @@
 			 
 			 return false;
 		}
+		
+		function copyOriginal(data)	{
+			 $.ajax({url: "dubletten/copy/" + data, success: function(result){
+				 showDetails(data);
+				  }});
+			 
+			 return false;
+		}
 	
 	</script>
 
@@ -31,7 +39,7 @@
 					<div class="h-100 layers">
 						<div class="scrollable pos-r bdT layer w-100 fxg-1 ps">
 							<ul class="p-20 nav flex-column">
-								<li class="nav-item"><a href="javascript:void(0)"
+								<li class="nav-item"><a href="?type=duplicates"
 									class="nav-link c-grey-800 cH-blue-500 actived"><div
 											class="peers ai-c jc-sb">
 											<div class="peer peer-greed">
@@ -42,13 +50,13 @@
 													class="badge rounded-pill bgc-deep-purple-50 c-deep-purple-700" th:text="${sumDups}">+99</span>
 											</div>
 										</div></a></li>
-										<li class="nav-item"><a href=""
+										<li class="nav-item"><a href="?type=externals"
 									class="nav-link c-grey-800 cH-blue-500"><div class="peers ai-c jc-sb">
 											<div class="peer peer-greed">
 												<i class="mR-10 ti-alert"></i> <span>External</span>
 											</div>
 											<div class="peer">
-												<span class="badge rounded-pill bgc-red-50 c-red-700">1</span>
+												<span class="badge rounded-pill bgc-red-50 c-red-700" th:text="${sumExt}">1</span>
 											</div>
 										</div></a></li>
 							</ul>
@@ -204,7 +212,7 @@
 												th:src="@{'image/'  + ${dup.id}}" />
 					</div>
 					<div class="peer">
-						<small th:text="${dup.originalDate}">Nov, 02 2017</small>
+						<small th:text="${#dates.format(dup.originalDate, 'dd.MM.yyyy HH:mm')}">Nov, 02 2017</small>
 						<h5 class="c-grey-900 mB-5" th:text="${dup.fileName}">Filename</h5>
 					<!-- 
 						<span>To: email@gmail.com</span>
@@ -235,6 +243,30 @@
 						</tr>
 					</tbody>
 				</table>
+			</div>
+			<div class="bdT pX-40 pY-30">
+				<h4>Eigentlicher Pfad der Datei</h4>
+				<table class="table">
+					<thead class="table-dark">
+						<tr>
+							<th>Dateiname</th>
+							<th>Eigentlicher Pfad</th>
+							<th>Aktionen</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="dups: ${dupList.?[isOriginal==true]}">
+							<th scope="row" th:text="${dups.fileName}">FileName</th>
+							<td th:text="${mainPath} + '\\' + ${dups.designationPath}">Mark</td>
+							<td>
+								<span th:if="${dups.isOriginal == true}" class="badge rounded-pill fl-r  bg-info  lh-0 p-10">Original</span>
+								<span th:if="${dups.isResolved == true && dups.isOriginal != true}" class="badge rounded-pill fl-r bg-success lh-0 p-10">Erledigt</span>
+								<button type="button" th:onclick="'javascript:copyOriginal(' + ${dups.id} + ')'" class="btn cur-p btn-warning btn-color">Kopieren</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<div id="resultCopy"></div>
 			</div>
 		</div>
 		<div class="ps__rail-x" style="left: 0px; bottom: 0px;">

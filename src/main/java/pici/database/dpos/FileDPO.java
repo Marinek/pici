@@ -1,5 +1,10 @@
 package pici.database.dpos;
 
+import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +27,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FileDPO {
-
+	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
@@ -33,7 +38,7 @@ public class FileDPO {
 
 	@OneToMany(mappedBy = "file", cascade = {CascadeType.ALL, CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<ExifTagDPO> exifTags = new HashSet<ExifTagDPO>();
-
+	
 	private String fileName;
 
 	private String contentHash;
@@ -52,6 +57,15 @@ public class FileDPO {
 		
 	}
 	
+	public Path getDesignationPath() {
+		Calendar originalDate = Calendar.getInstance();
+		originalDate.setTime(getOriginalDate());
+		
+		String year = String.valueOf(originalDate.get(Calendar.YEAR)); 
+		String month = String.format("%02d", (originalDate.get(Calendar.MONTH) + 1)); 
+		return Path.of(year, month);
+	}
+	
 	public String getFileType() {
 		for(ExifTagDPO tag : this.exifTags) {
 			if(tag.getDirectoryName().contentEquals("File Type")) {
@@ -62,14 +76,22 @@ public class FileDPO {
 		return "";
 	}
 	
-	public String getOriginalDate() {
+	public Date getOriginalDate() {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+		//1998:02:09 06:49:00
 		for(ExifTagDPO tag : this.exifTags) {
 			if(tag.getTagName().contentEquals("Date/Time Original")) {
-				return tag.getTagDescription();
+				Date parse = null;
+				try {
+					parse = format.parse(tag.getTagDescription());
+				} catch (ParseException e) {
+					return null;
+				}
+				return parse;
 			}
 		}
 		
-		return "";
+		return null;
 	}
 
 	@Override
