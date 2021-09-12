@@ -1,0 +1,248 @@
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head></head>
+
+<body>
+
+	<div th:fragment="content">
+
+		<script type="text/javascript">
+		function showDetails(duplicateId) {
+			$.get( "vDuplicates/" + duplicateId, function( data ) {
+				  $( "#showDetails" ).html( data );
+				})  .fail(function() {
+					  $( "#showDetails" ).html( "Error?" );
+				  });
+		}
+		
+		function setOriginal(data)	{
+			 $.ajax({url: "dubletten/original/" + data, success: function(result){
+				 showDetails(data);
+				  }});
+			 
+			 return false;
+		}
+	
+	</script>
+
+		<div class="full-container">
+			<div class="email-app">
+				<div class="email-side-nav remain-height ov-h">
+					<div class="h-100 layers">
+						<div class="scrollable pos-r bdT layer w-100 fxg-1 ps">
+							<ul class="p-20 nav flex-column">
+								<li class="nav-item"><a href="javascript:void(0)"
+									class="nav-link c-grey-800 cH-blue-500 actived"><div
+											class="peers ai-c jc-sb">
+											<div class="peer peer-greed">
+												<i class="mR-10 ti-email"></i> <span>Duplikate</span>
+											</div>
+											<div class="peer">
+												<span
+													class="badge rounded-pill bgc-deep-purple-50 c-deep-purple-700" th:text="${sumDups}">+99</span>
+											</div>
+										</div></a></li>
+										<li class="nav-item"><a href=""
+									class="nav-link c-grey-800 cH-blue-500"><div class="peers ai-c jc-sb">
+											<div class="peer peer-greed">
+												<i class="mR-10 ti-alert"></i> <span>External</span>
+											</div>
+											<div class="peer">
+												<span class="badge rounded-pill bgc-red-50 c-red-700">1</span>
+											</div>
+										</div></a></li>
+							</ul>
+							<div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+								<div class="ps__thumb-x" tabindex="0"
+									style="left: 0px; width: 0px;"></div>
+							</div>
+							<div class="ps__rail-y" style="top: 0px; right: 0px;">
+								<div class="ps__thumb-y" tabindex="0"
+									style="top: 0px; height: 0px;"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="email-wrapper row remain-height bgc-white ov-h">
+					<div class="email-list h-100 layers">
+			
+						<div class="layer w-100 fxg-1 scrollable pos-r ps ps--active-y">
+							<div class="">
+								<div th:each="duplicate : ${duplicates}"
+									class="email-list-item peers fxw-nw p-20 bdB bgcH-grey-100 cur-p"
+									th:onclick="'javascript:showDetails(' + ${duplicate.id} + ')'">
+									<div class="peer mR-10">
+										<div class="checkbox checkbox-circle checkbox-info peers ai-c">
+											<img class="bdrs-50p w-3r h-3r" height="50" width="50"
+												th:src="@{'image/'  + ${duplicate.id}}" />
+										</div>
+									</div>
+									<div class="peer peer-greed ov-h">
+										<div class="peers ai-c">
+											<div class="peer peer-greed">
+												<h6 th:text="${duplicate.fileType}" )>???</h6>
+											</div>
+											<div class="peer">
+												<small>...</small>
+											</div>
+										</div>
+										<h5 th:text="${duplicate.fileName}"
+											class="fsz-def tt-c c-grey-900">Dateiname</h5>
+										<span th:text="${duplicate.directory.pathName}"
+											class="whs-nw w-100 ov-h tov-e d-b">Pfad</span>
+									</div>
+								</div>
+							</div>
+							<div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+								<div class="ps__thumb-x" tabindex="0"
+									style="left: 0px; width: 0px;"></div>
+							</div>
+							<div class="ps__rail-y"
+								style="top: 0px; height: 1072px; right: 0px;">
+								<div class="ps__thumb-y" tabindex="0"
+									style="top: 0px; height: 760px;"></div>
+							</div>
+						</div>
+					</div>
+					<div id="showDetails" class="email-content h-100">
+						<div class="masonry-item col-md-12">
+							<div class="bd bgc-white">
+								<div class="layers">
+									<div class="layer w-100 p-20">
+										<h6 class="lh-1">Kurzbeschreibung</h6>
+									</div>
+									<div class="layer w-100">
+										<div class="bgc-light-blue-500 c-white p-20">
+											<div class="peers ai-c jc-sb gap-40">
+												<div class="peer peer-greed">
+													<h5>Duplikate</h5>
+													<p class="mB-0">Anzeige der Bilder, die mind. ein unbearbeitetes Duplikat haben.</p>
+												</div>
+												<div class="peer">
+													<h3 class="text-end"  th:text="${sumDups}">$6,000</h3>
+												</div>
+											</div>
+											
+										</div>		
+										<div class="c-red-700 c-white p-20">
+											<div class="peers ai-c jc-sb gap-40">
+												<div class="peer peer-greed">
+													<h5>External</h5>
+													<p class="mB-0">Bilder, die sich au&szlig;erhalb der Hauptbibliothek befinden.</p>
+												</div>
+												<div class="peer">
+													<h3 class="text-end"  th:text="${sumDups}">$6,000</h3>
+												</div>
+											</div>
+											
+										</div>								
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div class="h-100 scrollable pos-r ps" th:fragment="detail(dup=null)">
+		<div class="bgc-grey-100 peers ai-c jc-sb p-20 fxw-nw d-n@md+"
+			id="showDetails" th:if="${dup != null}">
+			<div class="peer">
+				<div class="btn-group" role="group">
+					<button type="button"
+						class="back-to-mailbox btn bgc-white bdrs-2 mR-3 cur-p">
+						<i class="ti-angle-left"></i>
+					</button>
+					<button type="button" class="btn bgc-white bdrs-2 mR-3 cur-p">
+						<i class="ti-folder"></i>
+					</button>
+					<button type="button" class="btn bgc-white bdrs-2 mR-3 cur-p">
+						<i class="ti-tag"></i>
+					</button>
+					<div class="btn-group" role="group">
+						<button id="btnGroupDrop1" type="button"
+							class="btn cur-p bgc-white no-after dropdown-toggle"
+							data-bs-toggle="dropdown" aria-haspopup="true"
+							aria-expanded="false">
+							<i class="ti-more-alt"></i>
+						</button>
+						<ul class="dropdown-menu fsz-sm" aria-labelledby="btnGroupDrop1">
+							<li><a href=""
+								class="d-b td-n pY-5 pX-10 bgcH-grey-100 c-grey-700"><i
+									class="ti-trash mR-10"></i> <span>Delete</span></a></li>
+							<li><a href=""
+								class="d-b td-n pY-5 pX-10 bgcH-grey-100 c-grey-700"><i
+									class="ti-alert mR-10"></i> <span>Mark as Spam</span></a></li>
+							<li><a href=""
+								class="d-b td-n pY-5 pX-10 bgcH-grey-100 c-grey-700"><i
+									class="ti-star mR-10"></i> <span>Star</span></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="peer">
+				<div class="btn-group" role="group">
+					<button type="button"
+						class="fsz-xs btn bgc-white bdrs-2 mR-3 cur-p">
+						<i class="ti-angle-left"></i>
+					</button>
+					<button type="button"
+						class="fsz-xs btn bgc-white bdrs-2 mR-3 cur-p">
+						<i class="ti-angle-right"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="email-content-wrapper">
+			<div class="peers ai-c jc-sb pX-40 pY-30">
+				<div class="peers peer-greed">
+					<div class="peer mR-20">
+					<img  class="bdrs-50p w-3r h-3r" height="50" width="50"
+												th:src="@{'image/'  + ${dup.id}}" />
+					</div>
+					<div class="peer">
+						<small th:text="${dup.originalDate}">Nov, 02 2017</small>
+						<h5 class="c-grey-900 mB-5" th:text="${dup.fileName}">Filename</h5>
+					<!-- 
+						<span>To: email@gmail.com</span>
+					 -->
+					</div>
+				</div>
+				
+			</div>
+			<div class="bdT pX-40 pY-30">
+				<h4>Duplikate gefunden</h4>
+				<table class="table">
+					<thead class="table-dark">
+						<tr>
+							<th>Dateiname</th>
+							<th>Verzeichnis</th>
+							<th>Aktionen</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="dups: ${dupList}">
+							<th scope="row" th:text="${dups.fileName}">FileName</th>
+							<td th:text="${dups.directory.pathName}">Mark</td>
+							<td>
+								<span th:if="${dups.isOriginal == true}" class="badge rounded-pill fl-r  bg-info  lh-0 p-10">Original</span>
+								<span th:if="${dups.isResolved == true && dups.isOriginal != true}" class="badge rounded-pill fl-r bg-success lh-0 p-10">Erledigt</span>
+								<button th:if="${dups.isResolved == false}" type="button" th:onclick="'javascript:setOriginal(' + ${dups.id} + ')'" class="btn cur-p btn-success btn-color">Original</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+			<div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+		</div>
+		<div class="ps__rail-y" style="top: 0px; right: 0px;">
+			<div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div>
+		</div>
+	</div>
+</body>
+</html>

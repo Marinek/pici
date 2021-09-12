@@ -51,6 +51,26 @@ public class FileDPO {
 		exifTagDPO.setFile(this);
 		
 	}
+	
+	public String getFileType() {
+		for(ExifTagDPO tag : this.exifTags) {
+			if(tag.getDirectoryName().contentEquals("File Type")) {
+				return tag.getTagDescription();
+			}
+		}
+		
+		return "";
+	}
+	
+	public String getOriginalDate() {
+		for(ExifTagDPO tag : this.exifTags) {
+			if(tag.getTagName().contentEquals("Date/Time Original")) {
+				return tag.getTagDescription();
+			}
+		}
+		
+		return "";
+	}
 
 	@Override
 	public String toString() {
