@@ -1,6 +1,8 @@
 package pici.database.dpos;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -30,7 +33,7 @@ public class DirectoryDPO {
 
 	@Column(unique = true)
 	private Path path;
-
+	
 	@Column(columnDefinition = "boolean default false")
 	private boolean scheduledScan = false;  
 
@@ -42,6 +45,9 @@ public class DirectoryDPO {
 	private Set<FileDPO> files;
 
 	private int count = 0;
+	
+	@Transient
+	private List<DirectoryDPO> subDirs = new ArrayList<DirectoryDPO>();
 	
 	public DirectoryDPO(Path path) {
 		this.path = path;

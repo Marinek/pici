@@ -1,0 +1,27 @@
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head></head>
+
+<body>
+
+	<div th:fragment="content">
+		
+		<table class="table">
+					<thead class="table-dark">
+						<tr>
+							<th>Verzeichnis</th>
+							<th>Aktionen</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="rootDir : ${dirList}">
+							<th scope="row" th:text="${rootDir}">FileName</th>
+							<td>
+								<button type="button" th:onclick="'javascript:copyOriginal()'" class="btn cur-p btn-warning btn-color">Kopieren</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+	</div>
+</body>
+</html>
